@@ -8,7 +8,7 @@ generateFiles <- function(inputFilePath, outputFolder, region_name, ...){
   source("data-raw/writeBoundaryRDA.R")
   source("data-raw/clusterReaches_customBoundary.R")
 
-  writeBoundaryRDA(inputFilePath, outputFolder)
+  writeBoundaryRDA(inputFilePath, outputFolder, region_name)
 
   suppressWarnings(clusterReachesCustom(outputFolder, region_name, ...))
 

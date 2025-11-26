@@ -12,12 +12,10 @@
 #      minCOMIDsCluster <- 0.1  # percent of COMIDs minimum per cluster, expressed as a fraction
 
 # Input data required:
-#      gadm41_USA_1 shapefile set of files containing state outline
 #      StreamCat_clusterVars.csv containing StreamCat clustering variables
 
 # Required input directory structure
 #     - in.dir (contains csv file with potential StreamCat variables to include)
-#     - in.dir/gadm41_USA_shp (contains USA state shapefiles)
 
 # Creates output directory structure (starts at the parent directory of the
 #     input directory), where brackets indicate the state abbreviation
@@ -85,7 +83,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   source("data-raw/addClusterIDs.R")
 
   ## Load boundary from outputFolder ---
-  load(file.path(outputFolder, "Boundary.rda"))
+  load(file.path(outputFolder, paste0(region_name, "_Boundary.rda")))
 
   ## Create output file paths ---
   if(dir.exists(file.path(outputFolder, "ClusterOutput")) == FALSE){dir.create(file.path(outputFolder, "ClusterOutput"))}
@@ -137,7 +135,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   }
   tictoc::toc(log = TRUE)
 
-  file.copy(file.path(out.dir, "NHDPlus", paste0("NHD_", region_name, ".rda")), file.path(outputFolder, "Reaches.rda"))
+  file.copy(file.path(out.dir, "NHDPlus", paste0("NHD_", region_name, ".rda")), file.path(outputFolder, paste0(region_name, "_Reaches.rda")))
   # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   # STEP 3: Get StreamCat data ----
@@ -569,7 +567,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
 
         num_criteria <- num_criteria %>% bind_rows(data.frame(num_clust = numtry, meets_criteria = "yes"))
 
-        write.csv(temp_df, file.path(outputFolder, "Clusters.csv"), row.names = FALSE)
+        write.csv(temp_df, file.path(outputFolder, paste0(region_name, "_Clusters.csv")), row.names = FALSE)
         write.csv(temp_df, file.path(out.dir, "HCPC", paste0(region_name, "_Clusters_", numtry, ".csv")), row.names = FALSE)
 
       } else { # try then next lower number of clusters
@@ -611,7 +609,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
                    map.title = region_name,
                    file.name = fn)))
 
-    write.csv(temp_df, file.path(outputFolder, "Clusters.csv"), row.names = FALSE)
+    write.csv(temp_df, file.path(outputFolder, paste0(region_name, "_Clusters.csv")), row.names = FALSE)
     write.csv(temp_df, file.path(out.dir, "HCPC", paste0(region_name, "_Clusters_", numtry, ".csv")), row.names = FALSE)
 
   } # End if user-desired number of clusters
