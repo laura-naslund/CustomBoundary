@@ -62,8 +62,6 @@
 #'
 #' @export
 
-boo.debug <- TRUE
-
 clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMIDsCluster = 0.2, user_numclust = NULL, boo.debug = FALSE){
 
   if(boo.debug){
@@ -110,7 +108,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   needed_libs <- setdiff(libs, .packages(all.available = TRUE))
   if(rlang::is_empty(needed_libs)==FALSE){
     install.packages(needed_libs)}
-  lapply(libs, require, character.only = TRUE)
+  suppressMessages(suppressWarnings(lapply(libs, require, character.only = TRUE)))
   # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   # STEP 2: Get NHD+ data ----
@@ -512,8 +510,6 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   maxclust <- floor(1/minCOMIDsCluster)
 
   num_criteria <- data.frame(numclust = c(), meets_criteria = c())
-  pick_list <- data.frame(region_name = c(), numclust = c(), fn = c())
-  file_names <- c()
 
   ## Define region orientation
   boundary_bbox <- sf::st_bbox(boundary)
@@ -554,17 +550,17 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
       fn_name <- paste0(region_name, "_ClusterGraphics_", dated, "_", numtry, ".png")
       fn = file.path(out.dir, fn_name)
 
-      file_names <- c(file_names, fn)
+     # file_names <- c(file_names, fn)
 
       # doesn't generate the figure, ,I think it is because the region isn't in the landscape layout vector so you will need to add that as an option and provide as a parameter
-      clusterGraphic(clusters = temp_df %>% mutate(COMID = as.integer(COMID)),
+      suppressMessages(suppressWarnings(clusterGraphic(clusters = temp_df %>% mutate(COMID = as.integer(COMID)),
                      pca1 = WS.STATE.PCA.rownames,
                      flowlines = reaches,
                      sites = NA,
                      STATE.map = boundary,
                      map.title = region_name,
                      file.name = fn,
-                     orient = orientation)
+                     orient = orientation)))
 
 
       if (min(temp_df_summary$n) > minCOMIDs) {
@@ -607,13 +603,13 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
     fn = file.path(out.dir, fn_name)
 
 
-    clusterGraphic(clusters = temp_df %>% mutate(COMID = as.integer(COMID)),
+    suppressMessages(suppressWarnings(clusterGraphic(clusters = temp_df %>% mutate(COMID = as.integer(COMID)),
                    pca1 = WS.STATE.PCA.rownames,
                    flowlines = reaches,
                    sites = NA,
                    STATE.map = boundary,
                    map.title = region_name,
-                   file.name = fn)
+                   file.name = fn)))
 
     write.csv(temp_df, file.path(outputFolder, "Clusters.csv"), row.names = FALSE)
     write.csv(temp_df, file.path(out.dir, "HCPC", paste0(region_name, "_Clusters_", numtry, ".csv")), row.names = FALSE)
@@ -621,9 +617,6 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   } # End if user-desired number of clusters
   tictoc::toc(log = TRUE)
 
-  num_criteria$file_names <- file_names
-
-  default_file_name <- num_criteria %>% filter(meets_criteria == "yes") %>% arrange(desc(num_clust)) %>% slice(1) %>% pull(file_names)
   default_numclust <- num_criteria %>% filter(meets_criteria == "yes") %>% arrange(desc(num_clust)) %>% slice(1) %>% pull(num_clust)
 
 
@@ -634,9 +627,8 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   tictoc::toc(log = TRUE)
 
   ## print time spent ----
-  print(region_name)
   tictoc::toc(log = TRUE)
 
-  return(paste0("Default number of clusters: ", default_numclust))
+  print(paste0("Default number of clusters: ", default_numclust))
 
 }
