@@ -597,7 +597,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
     temp_df <- data.frame(COMID = names(temp_tree), ClusterID = temp_tree %>% unname())
 
 
-    fn_name <- paste0(region_name, "_ClusterGraphics_", dated, "_", numtry,"_fastclust", ".png")
+    fn_name <- paste0(region_name, "_ClusterGraphics_", dated, "_", numtry, ".png")
     fn = file.path(out.dir, fn_name)
 
 
@@ -617,6 +617,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
 
   default_numclust <- num_criteria %>% filter(meets_criteria == "yes") %>% arrange(desc(num_clust)) %>% slice(1) %>% pull(num_clust)
 
+  file.copy(file.path(out.dir, paste0(region_name, "_ClusterGraphics_", dated, "_", default_numclust, ".png")), file.path(outputFolder, paste0(region_name, "_ClusterGraphic.png")))
 
   time2 <- Sys.time()
 
