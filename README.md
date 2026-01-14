@@ -21,20 +21,33 @@ pak::pak("laura-naslund/CustomBoundary")
 
 ## Generate files
 
-To generate files, provide the file paths 1) the location of the custom
-boundary geospatial file (e.g., .shp or .geojson), 2) desired output
-directory, 3) the region name in quotation marks that corresponds to the
-custom boundary.
+To generate files, provide:  
+1) the complete file path of the location of the custom boundary
+geospatial file (e.g., .shp or .geojson)  
+2) the complete file path of the desired output directory  
+3) the region name in quotation marks that corresponds to the custom
+boundary  
+4) TRUE/FALSE value for whether to generate watershed stressor data  
+5) a vector of two letter abbreviations of states contained in the
+custom boundary
 
-generateFiles(inputFilePath, outputFolder, region_name)
+Example: generateFiles(“C:/Users/user/Desktop/Input”,
+“C:/Users/user/Desktop/Output”, Region2, wsStressorData = TRUE, states =
+c(“NJ”, “NY”))
 
 Additional parameters can be provided to the clustering algorithm script
 (e.g., to override the default settings).
 
 ## Output
 
-generateFiles() will create 1) an rda file with the custom boundary, 2)
-a csv file assigning NHDPlus V2 reaches within the custom boundary to a
-cluster, 3) an rda file with NHDPlus V2 reach geometry, 4) a png file
-with a map of cluster results and PCA graphics, and 5) a ClusterOutput
-subfolder with additional files clustering-related files.
+generateFiles() will create:  
+1) an rda file with the custom boundary  
+2) a csv file assigning NHDPlus V2 reaches within the custom boundary to
+a cluster  
+3) an rda file with NHDPlus V2 reach geometry  
+4) a png file with a map of cluster results and PCA graphics  
+5) a ClusterOutput subfolder with additional files clustering-related
+files  
+6) (if requested) an rda file with watershed stressor data within the
+custom boundary  
+7) (if requested) an rda file with watershed stressor metadata

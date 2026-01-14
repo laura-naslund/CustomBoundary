@@ -60,11 +60,11 @@
 #'
 #' @export
 
-clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMIDsCluster = 0.2, user_numclust = NULL, boo.debug = FALSE){
+clusterReachesCustom<- function(outputFolder, regionName, pct_var = 60, minCOMIDsCluster = 0.2, user_numclust = NULL, boo.debug = FALSE){
 
   if(boo.debug){
     outputFolder <- "C:/Users/lnaslund/OneDrive - Environmental Protection Agency (EPA)/Profile/Desktop/Test/Output"
-    region_name <- "DEPied"
+    regionName <- "DEPied"
     pct_var <- 60
     minCOMIDsCluster <- 0.2
     user_numclust <- NULL
@@ -83,14 +83,14 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   source("data-raw/addClusterIDs.R")
 
   ## Load boundary from outputFolder ---
-  load(file.path(outputFolder, paste0(region_name, "_Boundary.rda")))
+  load(file.path(outputFolder, paste0(regionName, "_Boundary.rda")))
 
   ## Create output file paths ---
   if(dir.exists(file.path(outputFolder, "ClusterOutput")) == FALSE){dir.create(file.path(outputFolder, "ClusterOutput"))}
 
-  if(dir.exists(file.path(outputFolder, "ClusterOutput", region_name)) == FALSE){dir.create(file.path(outputFolder, "ClusterOutput", region_name))}
+  if(dir.exists(file.path(outputFolder, "ClusterOutput", regionName)) == FALSE){dir.create(file.path(outputFolder, "ClusterOutput", regionName))}
 
-  out.dir <- file.path(outputFolder, "ClusterOutput", region_name)
+  out.dir <- file.path(outputFolder, "ClusterOutput", regionName)
 
   out_folders <- c("Boundary", "HCPC", "Histograms", "NHDPlus", "PCA", "QC")
 
@@ -118,9 +118,9 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
    variables <- c("comid", tolower(qc_keep), "slope")
   #
   # # Check for existence of data
-  if (file.exists(file.path(out.dir, "NHDPlus", paste0("NHD_", region_name, ".rda")))) {
+  if (file.exists(file.path(out.dir, "NHDPlus", paste0("NHD_", regionName, ".rda")))) {
     message("Previously saved NHDPlus data loaded")
-    load(file.path(out.dir, "NHDPlus", paste0("NHD_", region_name, ".rda")))
+    load(file.path(out.dir, "NHDPlus", paste0("NHD_", regionName, ".rda")))
   } else {
     message("Acquiring NHDPlus data")
 
@@ -131,19 +131,19 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
     new.names <- c(toupper(variables), "geometry")
     colnames(reaches) <- paste(new.names)
     save(reaches, file = file.path(out.dir, "NHDPlus"
-                                     , paste0("NHD_", region_name, ".rda")))
+                                     , paste0("NHD_", regionName, ".rda")))
   }
   tictoc::toc(log = TRUE)
 
-  file.copy(file.path(out.dir, "NHDPlus", paste0("NHD_", region_name, ".rda")), file.path(outputFolder, paste0(region_name, "_Reaches.rda")))
+  file.copy(file.path(out.dir, "NHDPlus", paste0("NHD_", regionName, ".rda")), file.path(outputFolder, paste0(regionName, "_Reaches.rda")))
   # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
   # STEP 3: Get StreamCat data ----
   ## Create a list of StreamCat variables & NHD variables used in the cluster analysis.
   ## Write a file of StreamCat variables used as stressors in the CASTool.
   tictoc::tic("Get StreamCat data")
-  if (file.exists(file.path(out.dir, "NHDPlus", paste0("NHD_SC_", region_name, ".rda")))) {
-    load(file.path(out.dir, "NHDPlus", paste0("NHD_SC_", region_name, ".rda")))
+  if (file.exists(file.path(out.dir, "NHDPlus", paste0("NHD_SC_", regionName, ".rda")))) {
+    load(file.path(out.dir, "NHDPlus", paste0("NHD_SC_", regionName, ".rda")))
     message("Previously saved StreamCat data loaded")
   } else {
     message("Acquiring StreamCat data")
@@ -154,7 +154,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
 
     sc_ws_metrics <- read_csv(file.path("data-raw", "StreamCat_clusterVars.csv"))  %>%
       dplyr::filter(Type == "watershed") %>%
-      pull(Variable)
+      dplyr::pull(Variable)
 
     sc_ws_metrics_str <- paste(sc_ws_metrics, collapse = ",")
 
@@ -197,7 +197,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
 
     WS.STATE.SCvars <- dplyr::left_join(reaches, WS.STATE, by = "COMID")
     save(WS.STATE.SCvars, file = file.path(out.dir, "NHDPlus",
-                                           paste0("NHD_SC_", region_name, ".rda")))
+                                           paste0("NHD_SC_", regionName, ".rda")))
 
   }
 
@@ -245,7 +245,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   message(paste0("Removing ", n_na_row, " rows without StreamCat data"))
 
   save(WS.STATE.FinalRaw, file = file.path(out.dir, "PCA",
-                                           paste0("FinalRawData", region_name, ".rda")))
+                                           paste0("FinalRawData", regionName, ".rda")))
 
   tictoc::toc(log = TRUE)
   # ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -254,8 +254,8 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
   ## Get stats ----
   tictoc::tic("Get statistics & transform variables, if necessary")
 
-  if (file.exists(file.path(out.dir, "Histograms", paste0(region_name, "_stats.tab")))) {
-    WS.STATE.stats <- read.delim(file.path(out.dir, "Histograms", paste0(region_name, "_stats.tab")) , sep = "\t")
+  if (file.exists(file.path(out.dir, "Histograms", paste0(regionName, "_stats.tab")))) {
+    WS.STATE.stats <- read.delim(file.path(out.dir, "Histograms", paste0(regionName, "_stats.tab")) , sep = "\t")
     message("Previously saved histogram stats")
   } else {
 
@@ -275,13 +275,13 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
                        , SkewnessSq = Skewness * Skewness
                        , .groups = "drop_last")
     write.table(WS.STATE.stats
-                , file.path(out.dir, "Histograms", paste0(region_name, "_stats.tab"))
+                , file.path(out.dir, "Histograms", paste0(regionName, "_stats.tab"))
                 , sep = "\t", col.names = TRUE, row.names = FALSE, append = FALSE)
   }
 
-  if (file.exists(file.path(out.dir, "QC", paste0(region_name, "_WsTransfData.tab"))) & file.exists(file.path(out.dir, "QC", paste0(region_name, "_lambdas.tab")))){
-    WS.STATE.FinalTransf <- read.delim(file.path(out.dir, "QC", paste0(region_name, "_WsTransfData.tab")), sep = "\t")
-    df.lambda <- read.delim(file.path(out.dir, "QC", paste0(region_name, "_lambdas.tab")), sep = "\t")
+  if (file.exists(file.path(out.dir, "QC", paste0(regionName, "_WsTransfData.tab"))) & file.exists(file.path(out.dir, "QC", paste0(regionName, "_lambdas.tab")))){
+    WS.STATE.FinalTransf <- read.delim(file.path(out.dir, "QC", paste0(regionName, "_WsTransfData.tab")), sep = "\t")
+    df.lambda <- read.delim(file.path(out.dir, "QC", paste0(regionName, "_lambdas.tab")), sep = "\t")
     message("Previously saved QC files")
   } else{
 
@@ -393,15 +393,15 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
     message(paste0("removed: ", paste(rm_vars, collapse = ", "), " for 0 variation"))
 
     WS.STATE.FinalTransf <- df.temp
-    write.table(WS.STATE.FinalTransf, file.path(out.dir, "QC", paste0(region_name, "_WsTransfData.tab"))
+    write.table(WS.STATE.FinalTransf, file.path(out.dir, "QC", paste0(regionName, "_WsTransfData.tab"))
                 , sep = "\t", col.names = TRUE, row.names = FALSE, append = FALSE)
 
-    write.table(df.lambda, file.path(out.dir, "QC", paste0(region_name, "_lambdas.tab"))
+    write.table(df.lambda, file.path(out.dir, "QC", paste0(regionName, "_lambdas.tab"))
                 , sep = "\t", col.names = TRUE, row.names = FALSE, append = FALSE)
   }
 
-  if(file.exists(file.path(out.dir, "Histograms", paste0(region_name, "_TransfData_stats.tab")))){
-    WS.STATE.transf.stats <- read.delim(file.path(out.dir, "Histograms", paste0(region_name, "_TransfData_stats.tab")), sep = "\t")
+  if(file.exists(file.path(out.dir, "Histograms", paste0(regionName, "_TransfData_stats.tab")))){
+    WS.STATE.transf.stats <- read.delim(file.path(out.dir, "Histograms", paste0(regionName, "_TransfData_stats.tab")), sep = "\t")
     message("Previous saved histogram transformed stats")
   } else{
     ## Get new stats ----
@@ -421,7 +421,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
                        , SkewnessSq = Skewness * Skewness
                        , .groups = "drop_last")
     write.table(WS.STATE.transf.stats
-                , file.path(out.dir, "Histograms", paste0(region_name, "_TransfData_stats.tab"))
+                , file.path(out.dir, "Histograms", paste0(regionName, "_TransfData_stats.tab"))
                 , sep = "\t", col.names = TRUE, row.names = FALSE, append = FALSE)
   }
   tictoc::toc(log = TRUE)
@@ -429,8 +429,8 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
 
   # STEP 6: PCA ----
 
-  if(file.exists(file.path(out.dir, "PCA", paste0(region_name, "_PCAresults.rda")))){
-    load(file.path(out.dir, "PCA", paste0(region_name, "_PCAresults.rda")))
+  if(file.exists(file.path(out.dir, "PCA", paste0(regionName, "_PCAresults.rda")))){
+    load(file.path(out.dir, "PCA", paste0(regionName, "_PCAresults.rda")))
   } else {
 
     WS.STATE.FinalTransf.rownames <- WS.STATE.FinalTransf %>%
@@ -455,11 +455,11 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
                                                        ncp = ncpGTpctvar, scale = TRUE,
                                                        maxiter = 500)
     save(WS.STATE.impute.ALL.rownames,
-         file = file.path(out.dir, "PCA", paste0(region_name, "_ImputedData.rda")))
+         file = file.path(out.dir, "PCA", paste0(regionName, "_ImputedData.rda")))
 
     WS.STATE.imputedvals <- as.data.frame(WS.STATE.impute.ALL.rownames$completeObs)
     save(WS.STATE.imputedvals, file = file.path(out.dir, "PCA",
-                                                paste0(region_name, "_Input4PCA.rda")))
+                                                paste0(regionName, "_Input4PCA.rda")))
     tictoc::toc(log = TRUE)
 
     ## Perform PCA ----
@@ -474,27 +474,27 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
     p <- factoextra::fviz_screeplot(WS.STATE.PCA.rownames, addlabels = TRUE, ylim = c(0, 50),
                                     linecolor = "black")
     ggplot2::ggsave(file = file.path(out.dir, "PCA"
-                                     , paste0(region_name, "PCA_screeplot.png")),
+                                     , paste0(regionName, "PCA_screeplot.png")),
                     p, dpi = 600, width = 5, height = 5, units = "in")
     ## Variable plot
     p <- factoextra::fviz_pca_var(WS.STATE.PCA.rownames, col.var = "contrib", add.labels = TRUE
                                   , gradient.cols = c("#85D54AFF", "#2D708EFF", "#440154FF")
                                   , labelsize = 3, repel = TRUE)
-    ggplot2::ggsave(file = file.path(out.dir, "PCA", paste0(region_name, "_PCA_variables.png"))
+    ggplot2::ggsave(file = file.path(out.dir, "PCA", paste0(regionName, "_PCA_variables.png"))
                     , p, dpi = 600, width = 6, height = 6, units = "in")
 
     # Write outputs including eigenvalues, individuals, and variables
     write.table(WS.STATE.PCA.rownames$eig
-                , file.path(out.dir, "PCA", paste0(region_name, "PCA_eigenvalues.tab"))
+                , file.path(out.dir, "PCA", paste0(regionName, "PCA_eigenvalues.tab"))
                 , append = FALSE, col.names = TRUE, row.names = TRUE, sep = "\t")
     write.table(WS.STATE.PCA.rownames$ind
-                , file.path(out.dir, "PCA", paste0(region_name, "PCA_individuals.tab"))
+                , file.path(out.dir, "PCA", paste0(regionName, "PCA_individuals.tab"))
                 , append = FALSE, col.names = TRUE, row.names = TRUE, sep = "\t")
     write.table(WS.STATE.PCA.rownames$var
-                , file.path(out.dir, "PCA", paste0(region_name, "PCA_Variables.tab"))
+                , file.path(out.dir, "PCA", paste0(regionName, "PCA_Variables.tab"))
                 , append = FALSE, col.names = TRUE, row.names = TRUE, sep = "\t")
 
-    save(WS.STATE.PCA.rownames, file = file.path(out.dir, "PCA", paste0(region_name, "_PCAresults.rda")))
+    save(WS.STATE.PCA.rownames, file = file.path(out.dir, "PCA", paste0(regionName, "_PCAresults.rda")))
   }
   tictoc::toc(log = TRUE)
 
@@ -545,7 +545,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
         dplyr::group_by(ClusterID) %>%
         dplyr::summarize(n = dplyr::n())
 
-      fn_name <- paste0(region_name, "_ClusterGraphics_", dated, "_", numtry, ".png")
+      fn_name <- paste0(regionName, "_ClusterGraphics_", dated, "_", numtry, ".png")
       fn = file.path(out.dir, fn_name)
 
      # file_names <- c(file_names, fn)
@@ -556,7 +556,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
                      flowlines = reaches,
                      sites = NA,
                      STATE.map = boundary,
-                     map.title = region_name,
+                     map.title = regionName,
                      file.name = fn,
                      orient = orientation)))
 
@@ -567,15 +567,15 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
 
         num_criteria <- num_criteria %>% bind_rows(data.frame(num_clust = numtry, meets_criteria = "yes"))
 
-        write.csv(temp_df, file.path(outputFolder, paste0(region_name, "_Clusters.csv")), row.names = FALSE)
-        write.csv(temp_df, file.path(out.dir, "HCPC", paste0(region_name, "_Clusters_", numtry, ".csv")), row.names = FALSE)
+        write.csv(temp_df, file.path(outputFolder, paste0(regionName, "_Clusters.csv")), row.names = FALSE)
+        write.csv(temp_df, file.path(out.dir, "HCPC", paste0(regionName, "_Clusters_", numtry, ".csv")), row.names = FALSE)
 
       } else { # try then next lower number of clusters
         msg <- "Smallest cluster contains too few reaches."
         num_criteria <- num_criteria %>% bind_rows(data.frame(num_clust = numtry, meets_criteria = "no"))
         message(msg)
 
-        write.csv(temp_df, file.path(out.dir, "HCPC", paste0(region_name, "_Clusters_", numtry, ".csv")), row.names = FALSE)
+        write.csv(temp_df, file.path(out.dir, "HCPC", paste0(regionName, "_Clusters_", numtry, ".csv")), row.names = FALSE)
       }
 
 
@@ -597,7 +597,7 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
     temp_df <- data.frame(COMID = names(temp_tree), ClusterID = temp_tree %>% unname())
 
 
-    fn_name <- paste0(region_name, "_ClusterGraphics_", dated, "_", numtry, ".png")
+    fn_name <- paste0(regionName, "_ClusterGraphics_", dated, "_", numtry, ".png")
     fn = file.path(out.dir, fn_name)
 
 
@@ -606,23 +606,26 @@ clusterReachesCustom<- function(outputFolder, region_name, pct_var = 60, minCOMI
                    flowlines = reaches,
                    sites = NA,
                    STATE.map = boundary,
-                   map.title = region_name,
+                   map.title = regionName,
                    file.name = fn)))
 
-    write.csv(temp_df, file.path(outputFolder, paste0(region_name, "_Clusters.csv")), row.names = FALSE)
-    write.csv(temp_df, file.path(out.dir, "HCPC", paste0(region_name, "_Clusters_", numtry, ".csv")), row.names = FALSE)
+    write.csv(temp_df, file.path(outputFolder, paste0(regionName, "_Clusters.csv")), row.names = FALSE)
+    write.csv(temp_df, file.path(out.dir, "HCPC", paste0(regionName, "_Clusters_", numtry, ".csv")), row.names = FALSE)
 
   } # End if user-desired number of clusters
   tictoc::toc(log = TRUE)
 
-  default_numclust <- num_criteria %>% filter(meets_criteria == "yes") %>% arrange(desc(num_clust)) %>% slice(1) %>% pull(num_clust)
+  default_numclust <- num_criteria %>%
+    dplyr::filter(meets_criteria == "yes") %>%
+    dplyr::arrange(desc(num_clust)) %>%
+    dplyr::slice(1) %>%
+    dplyr::pull(num_clust)
 
-  file.copy(file.path(out.dir, paste0(region_name, "_ClusterGraphics_", dated, "_", default_numclust, ".png")), file.path(outputFolder, paste0(region_name, "_ClusterGraphic.png")))
+  file.copy(file.path(out.dir, paste0(regionName, "_ClusterGraphics_", dated, "_", default_numclust, ".png")), file.path(outputFolder, paste0(regionName, "_ClusterGraphic.png")))
 
   time2 <- Sys.time()
 
   time2 - time1
-  beepr::beep(8)
   tictoc::toc(log = TRUE)
 
   ## print time spent ----

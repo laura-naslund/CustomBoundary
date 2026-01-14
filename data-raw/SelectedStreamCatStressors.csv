@@ -1,0 +1,45 @@
+variable,description,type
+coalminedens,coal mine density,single
+nabd_dens,NABD dam density,single
+nabd_nidstor,NABD NID reservoir volume,single
+nabd_nrmstor,NABD normal reservoir volume,single
+npdesdens,NPDES site density,single
+pctagslphigh####,percent of agriculture of 20% slope,multiple dates
+pctagslpmid####,percent of agriculture of 10% slope,multiple dates
+pctburnarea####,wildfire burn percent,multiple dates
+pctcrop####,row crop percentage,multiple dates
+pcthay####,pasture/hay percentage,multiple dates
+pcthighsev####,percent high burn severity class,multiple dates
+pctimpslphigh####,mean imperviousness on 10% slope,multiple dates
+pctimpslpmid####,mean imperviousness on 20% slope,multiple dates
+pctimp####,mean imperviousness,multiple dates
+pctlowsev####,percent low burn severity class,multiple dates
+pctmodsev####,percent moderate burn severity class,multiple dates
+pctundsev####,percent underburned to low burn severity class,multiple dates
+pcturbhi####,developed high intensity land use percentage,multiple dates
+pcturblo####,developed low intensity land use percentage,multiple dates
+pcturbmd####,developed medium intensity land use percentage,multiple dates
+pcturbop####,developed open space land use percentage,multiple dates
+popden2010,mean population density 2010,single
+rdcrs,road and stream intersection density,single
+rdcrsslpwtd,road and stream intersection X NHD slope,single
+rddens,mean road density,single
+superfunddens,superfund site density,single
+tridens,toxic release inventory site density,single
+wwtpalldens,all wastewater treatment density,single
+wwtpmajordens,major wastewater treatment density,single
+wwtpminordens,minor wastewater treatment density,single
+n_ff_####,N applied to agricultural fields to fertilize crops,multiple dates
+p_ff_####,P applied to agricultural fields to fertilize crops,multiple dates
+n_uf_####,N applied in urban settings to fertilize non-agricultural plants,multiple dates
+p_uf_####,P applied in urban settings to fertilize non-agricultural plants,multiple dates
+n_hw_####,"N excreted from humans through waste or otherwise disposed of (e.g., down the drain)",multiple dates
+p_hw_####,"P excreted from humans through waste or otherwise disposed of (e.g., down the drain)",multiple dates
+n_lw_####,N excreted from livestock animals through manure,multiple dates
+p_lw_####,P excreted from livestock animals through manure,multiple dates
+n_cr_####,"N removed from agricultural fields through crop output harvest (e.g., fruit, vegetables, hay)",multiple dates
+p_cr_####,"P removed from agricultural fields through crop output harvest (e.g., fruit, vegetables, hay)",multiple dates
+n_lwr_####,N from livestock manure that is collected and applied to agricultural fields to fertilize crops,multiple dates
+p_lwr_####,P from livestock manure that is collected and applied to agricultural fields to fertilize crops,multiple dates
+n_ags_####,N agricultural surplus calculated as n_ff + n_lwr + n_cf - n_cr,multiple dates
+p_ags_####,P agricultural surplus calculated as p_ff + p_lwr - p_cr,multiple dates
