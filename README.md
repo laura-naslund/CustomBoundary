@@ -29,20 +29,21 @@ directory
 3) regionName: the region name in quotation marks that corresponds to
 the custom boundary  
 4) states: a vector of two letter abbreviations of states contained in
-the custom boundary 5) clustering: TRUE/FALSE value for whether to
-generate comparator site assignments using the CASTool default
-clustering algorithm (default = TRUE) 6) wsStressorData: TRUE/FALSE
-value for whether to generate watershed stressor data and metadata
-(default = TRUE)
+the custom boundary  
+5) clustering: TRUE/FALSE value for whether to generate comparator site
+assignments using the CASTool default clustering algorithm; default =
+TRUE  
+6) wsStressorData: TRUE/FALSE value for whether to generate watershed
+stressor data and metadata; default = TRUE
 
 Additional parameters can be supplied to the function to generate
-comparator assignments using the clustering algorithm 1) pct_var: the
-threshold cumulative percent variation used to determine the number of
-principal components to use for clustering (default = 60) 2)
-minCOMIDsCluster: the proportion of total reaches that must be in the
-smallest cluster (default = 0.2) 3) user_numclust: a user specified
-number of clusters (default = NULL, the algorithm will generate 1-5
-clusters)
+comparator assignments using the clustering algorithm  
+1) pct_var: the threshold cumulative percent variation used to determine
+the number of principal components to use for clustering; default = 60  
+2) minCOMIDsCluster: the proportion of total reaches that must be in the
+smallest cluster; default = 0.2  
+3) user_numclust: a user specified number of clusters; default = NULL,
+the algorithm will generate 1-5 clusters
 
 Example: generateFiles(inputFilePath = “C:/Users/user/Desktop/Input”,
 outputFolder = “C:/Users/user/Desktop/Output”, regionName = Region2,
@@ -52,15 +53,17 @@ states = c(“NJ”, “NY”), clustering = TRUE, wsStressorData = TRUE)
 
 generateFiles() will create:  
 1) regionName_Boundary.rda: an rda file with the boundary of the
-analysis region 2) regionName_Reaches.rda: an rda file with NHDPlusV2
-reach geometry within the analysis region 3) (if clustering = TRUE)
-regionName_ClusterGraphics.png: image(s) with a map of cluster results
-and PCA graphics  
+analysis region  
+2) regionName_Reaches.rda: an rda file with NHDPlusV2 reach geometry
+within the analysis region  
+3) (if clustering = TRUE) regionName_ClusterGraphics.png: image(s) with
+a map of cluster results and PCA graphics  
 4) (if clustering = TRUE) regionName_Clusters.csv: a csv file with
-cluster assignments for each NHDPlusV2 reach within the analysis region
+cluster assignments for each NHDPlusV2 reach within the analysis
+region  
 5) (if clustering = TRUE) a ClusterSuppl subfolder with additional
 clustering-related files  
 6) (if wsStressorData = TRUE) regionName_WSStressor.csv: a csv file with
-watershed stressor data within the analysis region 7) (if wsStressorData
-= TRUE) regionName_WSStressorInfo.csv: a csv file with watershed
-stressor metadata
+watershed stressor data within the analysis region  
+7) (if wsStressorData = TRUE) regionName_WSStressorInfo.csv: a csv file
+with watershed stressor metadata
