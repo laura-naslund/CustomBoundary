@@ -91,13 +91,13 @@ clusterGraphic <- function(clusters, pca1, flowlines, sites, STATE.map, map.titl
   clusters$pc2 <- pca1$ind$coord[, 2] # add PC2 score to clusters
 
   ### extract the data for the variable contributions to each of the pc axes.
-  pca.vars <- pca1$var$coord %>% data.frame
+  pca.vars <- pca1$var$coord|> data.frame()
   pca.vars$vars <- gsub("completeObs.", "", rownames(pca.vars)) # convert rownames to vars column without removing rownames
   ### Calculate the length of the vector
   pca.vars$vec.dist <- euc.dist(0, pca.vars[, 1], 0, pca.vars[, 2])
   ### Put the dataframe in order based on length of vector
-  pca.vars.desc <- pca.vars %>% dplyr::arrange(desc(vec.dist))
-  pca.vars.asc <- pca.vars %>% dplyr::arrange(vec.dist)
+  pca.vars.desc <- pca.vars|> dplyr::arrange(desc(vec.dist))
+  pca.vars.asc <- pca.vars|> dplyr::arrange(vec.dist)
 
   # Create color vector (range 1 to 6)
   maxClusterID <- max(as.numeric(clusters$ClusterID))
@@ -119,15 +119,14 @@ clusterGraphic <- function(clusters, pca1, flowlines, sites, STATE.map, map.titl
     mag.vec <- viridis::viridis(11)[c(3,7,11)]
   } else if (maxClusterID == 2) { # max clusters = 2
     mag.vec <- viridis::viridis(7)[c(3,7)]
-  }
-    else{
+  } else{
        mag.vec <- c("#31688EFF")
-    }
+  }
   # mag.vec <- viridis::viridis(15)[c(3,7,11,15)]
 
   # Prepare PCA plot (individuals) ----
-  pca.ind <- as.data.frame(pca1$ind$coord) %>%
-    tibble::rownames_to_column(var = "COMID") %>%
+  pca.ind <- as.data.frame(pca1$ind$coord) |>
+    tibble::rownames_to_column(var = "COMID") |>
     dplyr::mutate(COMID = as.integer(COMID))
   pca.ind <- dplyr::full_join(clusters, pca.ind, relationship = "one-to-one")
   pca.ind <- dplyr::mutate(pca.ind, ClusterID = as.character(ClusterID))
@@ -306,7 +305,7 @@ clusterGraphic <- function(clusters, pca1, flowlines, sites, STATE.map, map.titl
   # bbox_new[2] <- bbox_new[2] - (0.25 * yrange) # ymin - bottom
   bbox_new[4] <- bbox_new[4] + (0.05 * yrange) # ymax - top
 
-  bbox_new <- bbox_new %>%  # take the bounding box ...
+  bbox_new <- bbox_new|>  # take the bounding box ...
     sf::st_as_sfc() # ... and make it a sf polygon
 
   NHD.clust <- dplyr::right_join(flowlines, clusters[c("COMID", "ClusterID")])
@@ -317,15 +316,18 @@ clusterGraphic <- function(clusters, pca1, flowlines, sites, STATE.map, map.titl
     tmap::tm_lines("Cluster", palette = mag.vec, legend.col.show = FALSE) +
     tmap::tm_shape(STATE.map) +
     tmap::tm_borders(col = "black", lwd = 1) +
-    tmap::tm_layout(frame = FALSE, legend.show = FALSE, main.title = map.title,
-                    main.title.size = 1, main.title.fontface = "bold",
+    tmap::tm_layout(frame = FALSE, legend.show = FALSE,
+                    # main.title = map.title,
+                    # main.title.size = 1,
+                    # main.title.fontface = "bold",
                     # panel.show = TRUE, panel.labels = map.title,
                     # panel.label.bg.color = "white",
                     # panel.label.fontface = "bold",
                     # panel.label.height = 1.2,
-                    inner.margins = c(0,0,0,0))+
+                    # inner.margins = c(0,0,0,0),
+                    inner.margins = c(0.04, 0.04, 0.04, 0.04))+
     #LCN
-    tmap::tm_options(component.autoscale = FALSE)
+    tmap::tm_options(component.autoscale = TRUE)
   state.map.grob <- tmap::tmap_grob(state.map)
 
   # Change layout according to to state orientation
@@ -356,25 +358,27 @@ clusterGraphic <- function(clusters, pca1, flowlines, sites, STATE.map, map.titl
     if(!is.na(sites)){ # LCN added
       return.top.right <- cowplot::plot_grid(comid.site.count, all.comids.count,
                                              labels = c("B", "C"), nrow = 2)
-    }
-    else{
+    } else{
       return.top.right <- cowplot::plot_grid(all.comids.count,
                                              labels = c("B", "C"))
     }
 
 
+    title <- cowplot::ggdraw()+
+      cowplot::draw_label(map.title, fontface = "bold", x = 0, hjust = 0)
+
     return.top <- cowplot::plot_grid(state.map.grob, return.top.right, ncol = 2,
-                                     labels = c("A", ""), rel_heights = c(0.9, 1))
+                                     labels = c("A", ""), rel_heights = c(1, 1)) #rel_heights = c(0.9, 1)
 
     return.bottom <- cowplot::plot_grid(pca12, vars.max, vars.min,
                                         rel_heights = c(0.6, 0.6, 0.6),
                                         ncol = 3, labels = c("D", "E", "F"))
 
-    return.p <- cowplot::plot_grid(return.top, return.bottom, nrow = 2)
+    return.p <- cowplot::plot_grid(title, return.top, return.bottom, nrow = 3, rel_heights = c(0.04, 0.48, 0.48))
 
     png(file.name, width = 12, height = 8, units = "in", res = 600)
 
-    return.p %>% print()
+    return.p|> print()
 
     dev.off()
 
@@ -400,8 +404,11 @@ clusterGraphic <- function(clusters, pca1, flowlines, sites, STATE.map, map.titl
 
 
 
-    return.left <- cowplot::plot_grid(state.map.grob, return.bottom.left, nrow = 2,
-                                      labels = c("A", ""), rel_heights = c(1, 0.6))
+    title <- cowplot::ggdraw()+
+      cowplot::draw_label(map.title, fontface = "bold", x = 0, hjust = 0)
+
+    return.left <- cowplot::plot_grid(title, state.map.grob, return.bottom.left, nrow = 3,
+                                      labels = c("", "A", ""), rel_heights = c(0.1, 1, 0.6))
 
     return.right <- cowplot::plot_grid(pca12, vars.max, vars.min,
                                        rel_heights = c(0.6, 0.6, 0.6),
@@ -412,7 +419,7 @@ clusterGraphic <- function(clusters, pca1, flowlines, sites, STATE.map, map.titl
 
     png(file.name, width = 8, height = 12, units = "in", res = 600)
 
-    return.p %>% print()
+    return.p|> print()
 
     dev.off()
   }

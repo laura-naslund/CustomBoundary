@@ -22,32 +22,45 @@ pak::pak("laura-naslund/CustomBoundary")
 ## Generate files
 
 To generate files, provide:  
-1) the complete file path of the location of the custom boundary
-geospatial file (e.g., .shp or .geojson)  
-2) the complete file path of the desired output directory  
-3) the region name in quotation marks that corresponds to the custom
-boundary  
-4) TRUE/FALSE value for whether to generate watershed stressor data  
-5) a vector of two letter abbreviations of states contained in the
-custom boundary
+1) inputFilePath: the complete file path of the location of the custom
+boundary geospatial file (e.g., .shp or .geojson)  
+2) outputFolder: the complete file path of the desired output
+directory  
+3) regionName: the region name in quotation marks that corresponds to
+the custom boundary  
+4) states: a vector of two letter abbreviations of states contained in
+the custom boundary 5) clustering: TRUE/FALSE value for whether to
+generate comparator site assignments using the CASTool default
+clustering algorithm (default = TRUE) 6) wsStressorData: TRUE/FALSE
+value for whether to generate watershed stressor data and metadata
+(default = TRUE)
 
-Example: generateFiles(“C:/Users/user/Desktop/Input”,
-“C:/Users/user/Desktop/Output”, Region2, wsStressorData = TRUE, states =
-c(“NJ”, “NY”))
+Additional parameters can be supplied to the function to generate
+comparator assignments using the clustering algorithm 1) pct_var: the
+threshold cumulative percent variation used to determine the number of
+principal components to use for clustering (default = 60) 2)
+minCOMIDsCluster: the proportion of total reaches that must be in the
+smallest cluster (default = 0.2) 3) user_numclust: a user specified
+number of clusters (default = NULL, the algorithm will generate 1-5
+clusters)
 
-Additional parameters can be provided to the clustering algorithm script
-(e.g., to override the default settings).
+Example: generateFiles(inputFilePath = “C:/Users/user/Desktop/Input”,
+outputFolder = “C:/Users/user/Desktop/Output”, regionName = Region2,
+states = c(“NJ”, “NY”), clustering = TRUE, wsStressorData = TRUE)
 
 ## Output
 
 generateFiles() will create:  
-1) an rda file with the custom boundary  
-2) a csv file assigning NHDPlus V2 reaches within the custom boundary to
-a cluster  
-3) an rda file with NHDPlus V2 reach geometry  
-4) a png file with a map of cluster results and PCA graphics  
-5) a ClusterOutput subfolder with additional files clustering-related
-files  
-6) (if requested) an rda file with watershed stressor data within the
-custom boundary  
-7) (if requested) an rda file with watershed stressor metadata
+1) regionName_Boundary.rda: an rda file with the boundary of the
+analysis region 2) regionName_Reaches.rda: an rda file with NHDPlusV2
+reach geometry within the analysis region 3) (if clustering = TRUE)
+regionName_ClusterGraphics.png: image(s) with a map of cluster results
+and PCA graphics  
+4) (if clustering = TRUE) regionName_Clusters.csv: a csv file with
+cluster assignments for each NHDPlusV2 reach within the analysis region
+5) (if clustering = TRUE) a ClusterSuppl subfolder with additional
+clustering-related files  
+6) (if wsStressorData = TRUE) regionName_WSStressor.csv: a csv file with
+watershed stressor data within the analysis region 7) (if wsStressorData
+= TRUE) regionName_WSStressorInfo.csv: a csv file with watershed
+stressor metadata
